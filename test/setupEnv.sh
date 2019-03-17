@@ -41,7 +41,7 @@ function generateInitSqlFile() {
         if [[ ! -e ${tmp} ]];then
             echo -e "CREATE DATABASE IF NOT EXISTS test_$i;\n use test_$i;" > ${tmp}
             cat generator/mysql_test.sql >> ${tmp}
-            cat generator/mysql_simple.sql >> ${tmp}
+#            cat generator/mysql_simple.sql >> ${tmp}
         fi
         export mysql_init_${i}=$(pwd)/${tmp}
     done
@@ -82,4 +82,4 @@ env=$2
 generateMysqlTestData ${lines}
 generateInitSqlFile
 prepareEnv
-loadToMysql
+#loadToMysql
