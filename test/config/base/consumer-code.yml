@@ -61,8 +61,8 @@ output:
         "fields": "fields.*.flatten"
         "id": "id"
     batch:
-      size: 100
-      delay: 100
+      size: 5000
+      delay: 500
       maxRetry: 5
     failureLog:
       countLimit: 1000
