@@ -35,7 +35,7 @@ function setupDefaultPara() {
         build="n"
     fi
     if [[ -z "${num}" ]]; then
-        num=10000000
+        num=100
     fi
 }
 

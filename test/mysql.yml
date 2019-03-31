@@ -77,9 +77,9 @@ services:
     environment:
     - ES_ADDR=elasticsearch
     - ES_CLUSTER=test-cluster
-    - MYSQL_ADDR=mysql_0
-    - MYSQL_USER=root
-    - MYSQL_PASS=root
+    - MYSQL_ADDR=192.168.1.204
+    - MYSQL_USER=simu
+    - MYSQL_PASS=simu123
     - MONGO_ADDR=mongo
     - SYNCER_PRODUCER=/data/config/producer.yml
     - SYNCER_CONSUMER=/data/config/consumer/

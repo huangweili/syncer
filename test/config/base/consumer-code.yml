@@ -48,7 +48,6 @@ filter:
 # "extra.*.flatten"
 
 output:
-
   mysql:
     connection:
       address: ${MYSQL_ADDR}
@@ -63,7 +62,7 @@ output:
         "fields": "fields.*.flatten"
         "id": "id"
     batch:
-      size: 5000000
+      size: 1000000
       delay: 1000
       maxRetry: 5
     failureLog:
