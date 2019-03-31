@@ -1,35 +1,36 @@
 version: 1.2
 
-consumerId: drds
+consumerId: code
 
 
 input:
   masters:
-    - connection:
-        clusterNodes: [${MYSQL_ADDR}]
-      scheduler: mod
-      repos:
-        - name: "test_.*"
-          entities:
-          - name: correctness
-            fields: [time, news_id, currency, total, quantity, type, name, unit] # default id is not null, other can be null
-          - name: types
-            fields: [tinyint, bigint, char, varchar, text, decimal, double, timestamp]
-          - name: news
-            fields: [title, content, thumb_content, tags, affair_id, modify_time, plate_type, state, alliance_id, number, plate_sub_type]
-        - name: "simple"
-          entities:
-          - name: simple_type
-            fields: [tinyint, bigint, char, varchar, text, decimal, double, timestamp]
+  - connection:
+      address: ${MYSQL_ADDR}
+      port: 3306
+    scheduler: mod
+    repos:
+    - name: "test.*"
+      entities:
+      - name: correctness
+        fields: [time, news_id, currency, total] # default id is not null, other can be null
+      - name: types
+        fields: [tinyint, bigint, char, varchar, text, decimal, double, timestamp]
+      - name: news
+        fields: [plate_sub_type]
+    - name: "simple"
+      entities:
+      - name: simple_type
+        fields: [tinyint, bigint, char, varchar, text, decimal, double, timestamp]
 
 
 
 filter:
-- method: 'private static final String SIMPLE_TYPE = "simple_type";
-
-           @Override
-           public void filter(List<SyncData> list) {
+  - method: 'public void filter(List<SyncData> list) {
              SyncData sync = list.get(0);
+             if (!sync.updated()) {
+               list.clear();
+             }
              sync.addExtra("suffix", "");
              switch (sync.getEntity()) {
                case "news":
@@ -37,7 +38,7 @@ filter:
                  SyncUtil.toStr(sync, "content");
                  break;
                case "types":
-               case SIMPLE_TYPE:
+               case "simple_type":
                  SyncUtil.toStr(sync, "text");
                  SyncUtil.unsignedByte(sync, "tinyint");
                  sync.addExtra("suffix", "-" + ((long) sync.getId())%2);
@@ -46,12 +47,8 @@ filter:
                  SyncUtil.unsignedByte(sync, "type");
                  break;
              }
-             if (!sync.getEntity().equals(SIMPLE_TYPE)) {
-               sync.addExtra("target", "test_0");
-             } else {
-               sync.addExtra("target", sync.getRepo());
-             }
            }'
+
 
 
 # Special expression
@@ -68,7 +65,7 @@ output:
     requestMapping: # mapping from input data to es request
       enableExtraQuery: true
       retryOnUpdateConflict: 3
-      index: "repo + getExtra('suffix')" # default: repo
+      index: "repo + getExtra('target')" # default: repo
       documentId: "id" # default: id
       fieldsMapping: # default: fields.*.flatten
         "fields": "fields.*.flatten"
@@ -81,12 +78,12 @@ output:
       countLimit: 1000
   mysql:
     connection:
-      address: ${MYSQL_OUT}
+      address: ${MYSQL_ADDR}
       port: 3306
       user: root
       password: ${MYSQL_PASS}
     rowMapping:
-      schema: " getExtra('target') "
+      schema: "repo"
       table: "entity + '_bak'"
       id: "id"
       rows:
